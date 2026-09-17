@@ -1,0 +1,18 @@
+PKG_NAME="firefox"
+PKG_VER="121.0"
+PKG_DESC="Mozilla Firefox Official Binary"
+PKG_CAT="extra"
+
+package_binary() {
+    URL="https://download-installer.cdn.mozilla.net/pub/firefox/releases/121.0/linux-x86_64/en-US/firefox-121.0.tar.bz2"
+    echo "Descargando Firefox oficial..."
+    wget -qO firefox.tar.bz2 "$URL"
+    
+    # Descomprimir en /opt
+    mkdir -p "$PKG_DEST/opt"
+    tar -xf firefox.tar.bz2 -C "$PKG_DEST/opt/"
+    
+    # Crear el symlink en /usr/bin para que el usuario pueda ejecutar 'firefox'
+    mkdir -p "$PKG_DEST/usr/bin"
+    ln -s /opt/firefox/firefox "$PKG_DEST/usr/bin/firefox"
+}

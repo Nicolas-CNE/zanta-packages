@@ -1,0 +1,15 @@
+PKG_NAME="nvim"
+PKG_VER="0.9.4"
+PKG_DESC="Vim-fork focused on extensibility and usability"
+PKG_CAT="core"
+
+package_binary() {
+    URL="https://github.com/neovim/neovim/releases/download/v0.9.4/nvim-linux64.tar.gz"
+    echo "Descargando Neovim precompilado..."
+    wget -qO nvim.tar.gz "$URL"
+    
+    # Extraer y mover a la estructura estándar de Linux (/usr/bin, /usr/share, etc)
+    tar -xf nvim.tar.gz
+    mkdir -p "$PKG_DEST/usr"
+    cp -r nvim-linux64/* "$PKG_DEST/usr/"
+}
