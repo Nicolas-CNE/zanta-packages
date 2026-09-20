@@ -1,0 +1,15 @@
+PKG_NAME="busybox"
+PKG_VER="1.36.1"
+PKG_CAT="core"
+PKG_DESC="BusyBox coreutils base"
+
+package_binary() {
+    mkdir -p "$PKG_DEST/bin"
+    wget -qO "$PKG_DEST/bin/busybox" "https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox"
+    chmod +x "$PKG_DEST/bin/busybox"
+}
+
+POST_INSTALL='
+echo "Instalando symlinks de BusyBox..."
+/bin/busybox --install -s /bin
+'

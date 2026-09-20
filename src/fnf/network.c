@@ -14,7 +14,6 @@ size_t get_remote_file_size(const char *url) {
     return size;
 }
 
-// <-- NUEVO: Recibimos const char *category
 bool download_package(const char *pkg_filename, const char *category, const char *dest_path) {
     char local_file[512];
     snprintf(local_file, sizeof(local_file), "%s/%s", dest_path, pkg_filename);
@@ -27,8 +26,6 @@ bool download_package(const char *pkg_filename, const char *category, const char
 
     printf("downloading %s...\n", pkg_filename);
     char cmd[1024];
-    
-    // <-- NUEVO: Intercalamos %s (category) en la URL
     snprintf(cmd, sizeof(cmd), "wget -O \"%s\" \"%s/%s/%s\"", local_file, REPO_URL, category, pkg_filename);
     
     int res = system(cmd);

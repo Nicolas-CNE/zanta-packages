@@ -7,7 +7,7 @@ bool sync_repositories(void) {
     printf("[fnf] Sincronizando bases de datos de repositorios Zanta Linux...\n");
     system("mkdir -p /var/db/fnf/repo");
     
-    int res = system("wget -q -O /var/db/fnf/repo/db.txt " DB_URL);
+    int res = system("wget -q -O /var/db/fnf/repo/db.txt \"" DB_URL "\"");
     if (res == 0) {
         printf("Sincronización completada con éxito.\n");
         return true;

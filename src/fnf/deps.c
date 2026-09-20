@@ -16,6 +16,20 @@ static bool is_already_added(Package *list, int count, const char *name) {
     return false;
 }
 
+// Función personalizada para dividir por '|' respetando campos vacíos
+static int split_pipes(char *line, char **fields, int max_fields) {
+    int count = 0;
+    fields[count++] = line;
+    while (*line && count < max_fields) {
+        if (*line == '|') {
+            *line = '\0';
+            fields[count++] = line + 1;
+        }
+        line++;
+    }
+    return count;
+}
+
 static bool find_package_in_db(const char *name, Package *pkg) {
     FILE *fp = fopen("/var/db/fnf/repo/db.txt", "r");
     if (!fp) return false;
@@ -25,35 +39,29 @@ static bool find_package_in_db(const char *name, Package *pkg) {
         line[strcspn(line, "\r\n")] = 0;
         if (strlen(line) == 0) continue;
 
-        char *saveptr;
-        char *p_name = strtok_r(line, "|", &saveptr);
-        char *p_ver = strtok_r(NULL, "|", &saveptr);
-        char *p_dsize = strtok_r(NULL, "|", &saveptr);
-        char *p_ksize = strtok_r(NULL, "|", &saveptr);
-        char *p_cat = strtok_r(NULL, "|", &saveptr);  // <-- EXTRAEMOS CATEGORÍA
-        char *p_deps = strtok_r(NULL, "|", &saveptr);
-        char *p_weaks = strtok_r(NULL, "|", &saveptr);
+        char *fields[10] = {0};
+        int nfields = split_pipes(line, fields, 10);
 
-        if (p_name && strcmp(p_name, name) == 0) {
+        if (nfields >= 5 && fields[0] && strcmp(fields[0], name) == 0) {
             memset(pkg, 0, sizeof(Package));
-            strncpy(pkg->name, p_name, MAX_NAME - 1);
-            if (p_ver) strncpy(pkg->version, p_ver, MAX_NAME - 1);
-            if (p_dsize) pkg->download_size = strtoul(p_dsize, NULL, 10);
-            if (p_ksize) pkg->disk_size = strtoul(p_ksize, NULL, 10);
-            if (p_cat) strncpy(pkg->category, p_cat, 31); // <-- GUARDAMOS CATEGORÍA
+            strncpy(pkg->name, fields[0], MAX_NAME - 1);
+            if (nfields > 1 && fields[1]) strncpy(pkg->version, fields[1], MAX_NAME - 1);
+            if (nfields > 2 && fields[2]) pkg->download_size = strtoul(fields[2], NULL, 10);
+            if (nfields > 3 && fields[3]) pkg->disk_size = strtoul(fields[3], NULL, 10);
+            if (nfields > 4 && fields[4]) strncpy(pkg->category, fields[4], 31);
 
-            if (p_deps && strlen(p_deps) > 0) {
+            if (nfields > 5 && fields[5] && strlen(fields[5]) > 0) {
                 char *dep_save;
-                char *dep = strtok_r(p_deps, ",", &dep_save);
+                char *dep = strtok_r(fields[5], ",", &dep_save);
                 while (dep && pkg->dep_count < MAX_DEPS) {
                     strncpy(pkg->deps[pkg->dep_count++], dep, MAX_NAME - 1);
                     dep = strtok_r(NULL, ",", &dep_save);
                 }
             }
 
-            if (p_weaks && strlen(p_weaks) > 0) {
+            if (nfields > 6 && fields[6] && strlen(fields[6]) > 0) {
                 char *weak_save;
-                char *weak = strtok_r(p_weaks, ",", &weak_save);
+                char *weak = strtok_r(fields[6], ",", &weak_save);
                 while (weak && pkg->weak_dep_count < MAX_DEPS) {
                     strncpy(pkg->weak_deps[pkg->weak_dep_count++], weak, MAX_NAME - 1);
                     weak = strtok_r(NULL, ",", &weak_save);

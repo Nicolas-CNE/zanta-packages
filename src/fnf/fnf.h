@@ -6,17 +6,16 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define FNF_VERSION "0.1.0-alpha"
+#define FNF_VERSION "0.3.0-clean"
 #define MAX_DEPS 32
 #define MAX_NAME 64
 
-// Estructura de Paquete
 typedef struct Package {
     char name[MAX_NAME];
     char version[MAX_NAME];
     size_t download_size;
     size_t disk_size;
-    char category[32];   // <-- NUEVO: Almacenará 'core', 'lib' o 'extra'
+    char category[32];
     char deps[MAX_DEPS][MAX_NAME];
     int dep_count;
     char weak_deps[MAX_DEPS][MAX_NAME];
@@ -30,12 +29,16 @@ typedef struct DAGNode {
     bool visited;
 } DAGNode;
 
+void execute_transaction(Package *pkgs, int count, const char *explicit_pkg);
+void remove_package(const char *pkg_name);
+void search_packages(const char *query);
+void list_installed(void);
+void autoremove_packages(const char *binary_path);
+
 DAGNode* create_dag_node(Package pkg);
 bool resolve_dependencies(const char *target_pkg, Package *install_list, int *total_pkgs);
 size_t get_remote_file_size(const char *url);
-// <-- NUEVO: Actualizamos el prototipo para recibir la categoría
 bool download_package(const char *pkg_filename, const char *category, const char *dest_path); 
 bool sync_repositories(void);
-void execute_transaction(Package *pkgs, int count);
 
 #endif
