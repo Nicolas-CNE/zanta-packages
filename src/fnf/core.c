@@ -1,4 +1,4 @@
-k#include "fnf.h"
+#include "fnf.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
